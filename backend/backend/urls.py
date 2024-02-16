@@ -18,8 +18,14 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework_jwt.views import obtain_jwt_token
 from django.views.static import serve
-from django.conf.urls import include, url
+from django.conf.urls import include
 from django.conf import settings
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.views.static import serve
+from rest_framework_jwt.views import obtain_jwt_token
 
 
 def trigger_error(request):
@@ -31,14 +37,11 @@ urlpatterns = [
 
     path('jobs/', include('jobs.urls')),
     path('users/', include('users.urls')),
-    url(r'^admin/', include('smuggler.urls')),  # before admin url patterns!
     path('admin/', admin.site.urls),
-    path('token-auth/', obtain_jwt_token,),
-    url(r'^media/(?P<path>.*)$', serve,
-        {'document_root': settings.MEDIA_ROOT, }),
-    url(r'^static/(?P<path>.*)$', serve,
-        {'document_root': settings.STATIC_ROOT, }),
-]
+    path('token-auth/', obtain_jwt_token),
+    path('media/<path:path>/', serve, {'document_root': settings.MEDIA_ROOT}),
+    path('static/<path:path>/', serve, {'document_root': settings.STATIC_ROOT}),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
 if settings.DEBUG:
